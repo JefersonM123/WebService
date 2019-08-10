@@ -1,6 +1,10 @@
 package com.course.entities;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private Long id;
 	private String name;
 	private String email;
@@ -17,6 +21,50 @@ public class User {
 		this.email = email;
 		this.phone = phone;
 		this.password = password;
+	}
+
+	public final Long getId() {
+		return id;
+	}
+
+	public final void setId(Long id) {
+		this.id = id;
+	}
+
+	public final String getName() {
+		return name;
+	}
+
+	public final void setName(String name) {
+		this.name = name;
+	}
+
+	public final String getEmail() {
+		return email;
+	}
+
+	public final void setEmail(String email) {
+		this.email = email;
+	}
+
+	public final String getPhone() {
+		return phone;
+	}
+
+	public final void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public final String getPassword() {
+		return password;
+	}
+
+	public final void setPassword(String password) {
+		this.password = password;
+	}
+
+	public static final long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	@Override
