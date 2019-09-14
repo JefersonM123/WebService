@@ -17,7 +17,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.course.dto.UserDTO;
 import com.course.dto.UserInsertDTO;
-import com.course.entities.User;
 import com.course.services.UserService;
 
 @RestController
