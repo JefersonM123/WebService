@@ -9,12 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Table(name = "tb_category")
@@ -27,8 +22,7 @@ public class Category implements Serializable{
 	
 	private String name;
 	
-	@ManyToMany(mappedBy="categories")
-	@JsonIgnore
+	@ManyToMany(mappedBy="categories")	
 	private Set<Product> products = new HashSet<>();
 	
 	public Category() {}

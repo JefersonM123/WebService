@@ -6,11 +6,13 @@ import java.time.Instant;
 import com.course.entities.Order;
 import com.course.entities.User;
 import com.course.entities.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class OrderDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant moment;
 	private Integer orderStatus;
 	private Long clientId;
