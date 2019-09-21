@@ -2,13 +2,19 @@ package com.course.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
+import com.course.dto.OrderDTO;
+import com.course.dto.UserDTO;
 import com.course.entities.Order;
-import com.course.entities.User;
 import com.course.repositories.OrderRepository;
+import com.course.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class OrderService {
@@ -16,14 +22,16 @@ public class OrderService {
 	@Autowired
 	private OrderRepository repository;
 	
-	public List<Order> findAll(){
-		return repository.findAll();
+	public List<OrderDTO> findAll(){
+		List<Order> list = repository.findAll();
+		return list.stream().map(e -> new OrderDTO(e)).collect(Collectors.toList());
 	}
 	
-	public Order findById(Long id) {
+	@Transactional
+	public OrderDTO findById(Long id) {
 		Optional<Order> obj = repository.findById(id);
-		
-		return obj.get();
+		Order entity = obj.orElseThrow(() -> new ResourceNotFoundException(id));
+		return new OrderDTO(entity);
 	}
 
 }

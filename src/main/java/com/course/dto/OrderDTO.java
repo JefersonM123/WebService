@@ -2,12 +2,9 @@ package com.course.dto;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.course.entities.Order;
-import com.course.entities.Payment;
+import com.course.entities.User;
 import com.course.entities.enums.OrderStatus;
 
 public class OrderDTO implements Serializable {
@@ -16,29 +13,36 @@ public class OrderDTO implements Serializable {
 	private Long id;
 	private Instant moment;
 	private Integer orderStatus;
-	private UserDTO client;
-	private List<ProductDTO> items = new ArrayList<ProductDTO>();
-	private Payment payment;
+	private Long clientId;
+	private String clientName;
+	private String clientEmail;
 
-	public OrderDTO(Long id, Instant moment, Integer orderStatus, UserDTO client, List<ProductDTO> items,
-			Payment payment) {
+	public OrderDTO() { }
+
+	public OrderDTO(Long id, Instant moment, Integer orderStatus, Long clientId, String clientName,
+			String clientEmail) {
 		super();
 		this.id = id;
 		this.moment = moment;
 		this.orderStatus = orderStatus;
-		this.client = client;
-		this.items = items;
-		this.payment = payment;
+		this.clientId = clientId;
+		this.clientName = clientName;
+		this.clientEmail = clientEmail;
 	}
 
 	public OrderDTO(Order order) {
+		if(order.getClient() == null) {
+			throw new IllegalArgumentException("Error instantiating OrderDTO: client was null");
+		}
+		
 		this.id = order.getId();
 		this.moment = order.getMoment();
 		this.orderStatus = order.getOrderStatus().getCode();
-		this.client = new UserDTO(order.getClient());
-		this.items = order.getIktems().stream().map(e -> new ProductDTO(e.getProduct())).collect(Collectors.toList());
-		this.payment = order.getPayment();
+		this.clientId = order.getClient().getId();
+		this.clientName = order.getClient().getName();
+		this.clientEmail = order.getClient().getEmail();		
 	}
+
 
 	public Long getId() {
 		return id;
@@ -64,32 +68,32 @@ public class OrderDTO implements Serializable {
 		this.orderStatus = orderStatus;
 	}
 
-	public UserDTO getClient() {
-		return client;
+	public Long getClientId() {
+		return clientId;
 	}
 
-	public void setClient(UserDTO client) {
-		this.client = client;
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
 	}
 
-	public List<ProductDTO> getItems() {
-		return items;
+	public String getClientName() {
+		return clientName;
 	}
 
-	public void setItems(List<ProductDTO> items) {
-		this.items = items;
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
 	}
 
-	public Payment getPayment() {
-		return payment;
+	public String getClientEmail() {
+		return clientEmail;
 	}
 
-	public void setPayment(Payment payment) {
-		this.payment = payment;
+	public void setClientEmail(String clientEmail) {
+		this.clientEmail = clientEmail;
 	}
-
-	public Order toEnttiy() {
-		return new Order(id, moment, OrderStatus.valueOf(orderStatus), client.toEntity());
+	
+	public Order toEntity() {
+		User client  = new User(clientId, clientName, clientEmail, null, null);
+		return new Order(id, moment, OrderStatus.valueOf(orderStatus),client);		
 	}
-
 }
