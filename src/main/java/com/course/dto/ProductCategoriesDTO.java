@@ -3,7 +3,11 @@ package com.course.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
+
+import org.hibernate.validator.constraints.Length;
 
 import com.course.entities.Product;
 
@@ -11,8 +15,15 @@ public class ProductCategoriesDTO  implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@NotEmpty(message = "Can't be empty")
+	@Length(min = 3, max = 80, message = "Length must be  between 3 and 80")
 	private String name;
+	
+	@NotEmpty(message = "Can't be empty")
+	@Length(min = 8, message = "Length must be major than 8")
 	private String description;
+	
+	@Positive(message = "Can't be negative")
 	private Double price;	
 	private String imgUrl;
 	private List<CategoryDTO> categories = new ArrayList<>();
