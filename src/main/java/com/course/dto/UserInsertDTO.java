@@ -8,7 +8,9 @@ import javax.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Length;
 
 import com.course.entities.User;
+import com.course.services.validation.UserInsertValid;
 
+@UserInsertValid
 public class UserInsertDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
@@ -19,6 +21,7 @@ public class UserInsertDTO implements Serializable{
 	
 	@NotEmpty(message = "Can't be empty")
 	@Email(message = "Invalid email")
+	
 	private String email;
 	
 	@NotEmpty(message = "Can't be empty")

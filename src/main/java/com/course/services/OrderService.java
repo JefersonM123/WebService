@@ -8,10 +8,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 import com.course.dto.OrderDTO;
-import com.course.dto.UserDTO;
 import com.course.entities.Order;
 import com.course.repositories.OrderRepository;
 import com.course.services.exceptions.ResourceNotFoundException;
