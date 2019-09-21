@@ -54,7 +54,7 @@ public class UserService {
 
 	@Transactional
 	public UserDTO update(Long id, UserDTO dto) {
-		try {
+		try {			
 			User entity = repository.getOne(id);
 			updateData(entity, dto);
 			entity = repository.save(entity);

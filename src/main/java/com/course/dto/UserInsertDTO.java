@@ -20,8 +20,7 @@ public class UserInsertDTO implements Serializable{
 	private String name;
 	
 	@NotEmpty(message = "Can't be empty")
-	@Email(message = "Invalid email")
-	
+	@Email(message = "Invalid email")	
 	private String email;
 	
 	@NotEmpty(message = "Can't be empty")
