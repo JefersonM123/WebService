@@ -4,14 +4,19 @@ import java.io.Serializable;
 
 import com.course.entities.Category;
 
-public class CategoryDTO implements Serializable {	
-		private static final long serialVersionUID = 1L;
-		
-		private Long id;
+public class CategoryDTO implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	private Long id;
 	private String name;
-	
+
 	public CategoryDTO(String name) {
 		this.name = name;
+	}
+
+	public CategoryDTO(Long id, String name) {
+		this.name = name;
+		this.id = id;
 	}
 	
 	public CategoryDTO(Category category) {
@@ -26,7 +31,7 @@ public class CategoryDTO implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
