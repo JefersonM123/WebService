@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.course.dto.CredentialsDTO;
 import com.course.dto.TokenDTO;
+import com.course.entities.Order;
 import com.course.entities.User;
 import com.course.repositories.UserRepository;
 import com.course.security.JWTUtil;
@@ -26,7 +27,7 @@ public class AuthService {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private JWTUtil jwtUtil;
 
@@ -41,20 +42,29 @@ public class AuthService {
 			throw new JWTAuthenticationException("Bad credentials");
 		}
 	}
-	
+
 	public User authenticated() {
 		try {
-			UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
 			return userRepository.findByEmail(userDetails.getUsername());
-		}catch(Exception e) {
-			throw new JWTAuthorizationException("Access denied");
-		}				
-	}
-	
-	public void validadeSelfOrAdmin(Long userId) {
-		User user = authenticated();
-		if(user == null || (!user.getId().equals(userId) && !user.hasRole("ROLE_ADMIN")) ) {
+		} catch (Exception e) {
 			throw new JWTAuthorizationException("Access denied");
 		}
 	}
+
+	public void validadeSelfOrAdmin(Long userId) {
+		User user = authenticated();
+		if (user == null || (!user.getId().equals(userId) && !user.hasRole("ROLE_ADMIN"))) {
+			throw new JWTAuthorizationException("Access denied");
+		}
+	}
+
+	public void validadeOwnOrderOrAdmin(Order order) {
+		User user = authenticated();
+		if (user == null || (!user.getId().equals(order.getClient().getId()) && !user.hasRole("ROLE_ADMIN"))) {
+			throw new JWTAuthorizationException("Access denied");
+		}
+	}
+
 }
