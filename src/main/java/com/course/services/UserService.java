@@ -3,14 +3,15 @@ package com.course.services;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.course.dto.UserDTO;
 import com.course.dto.UserInsertDTO;
@@ -24,6 +25,9 @@ public class UserService {
 
 	@Autowired
 	private UserRepository repository;
+	
+	@Autowired
+	private BCryptPasswordEncoder passwordEncode;
 
 	public List<UserDTO> findAll() {
 		List<User> list = repository.findAll();
@@ -37,7 +41,9 @@ public class UserService {
 	}
 
 	public UserDTO insert(UserInsertDTO dto) {
-		User entity = dto.toEntity();				
+		
+		User entity = dto.toEntity();
+		entity.setPassword(passwordEncode.encode(dto.getPassword()));
 		entity = repository.save(entity);
 		return new UserDTO(entity);
 	}
