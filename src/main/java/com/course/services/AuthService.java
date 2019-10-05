@@ -5,13 +5,18 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.course.dto.CredentialsDTO;
 import com.course.dto.TokenDTO;
-import com.course.resources.exceptions.JWTAuthenticationException;
+import com.course.entities.User;
+import com.course.repositories.UserRepository;
 import com.course.security.JWTUtil;
+import com.course.services.exceptions.JWTAuthenticationException;
+import com.course.services.exceptions.JWTAuthorizationException;
 
 @Service
 public class AuthService {
@@ -19,6 +24,9 @@ public class AuthService {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	@Autowired
+	private UserRepository userRepository;
+	
 	@Autowired
 	private JWTUtil jwtUtil;
 
@@ -32,6 +40,21 @@ public class AuthService {
 		} catch (AuthenticationException e) {
 			throw new JWTAuthenticationException("Bad credentials");
 		}
-
+	}
+	
+	public User authenticated() {
+		try {
+			UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return userRepository.findByEmail(userDetails.getUsername());
+		}catch(Exception e) {
+			throw new JWTAuthorizationException("Access denied");
+		}				
+	}
+	
+	public void validadeSelfOrAdmin(Long userId) {
+		User user = authenticated();
+		if(user == null || (!user.getId().equals(userId) && !user.hasRole("ROLE_ADMIN")) ) {
+			throw new JWTAuthorizationException("Access denied");
+		}
 	}
 }

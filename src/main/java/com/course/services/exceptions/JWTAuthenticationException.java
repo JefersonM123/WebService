@@ -1,4 +1,4 @@
-package com.course.resources.exceptions;
+package com.course.services.exceptions;
 
 public class JWTAuthenticationException extends RuntimeException{
 	private static final long serialVersionUID = 1L;

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.course.services.exceptions.DataBaseException;
+import com.course.services.exceptions.JWTAuthenticationException;
+import com.course.services.exceptions.JWTAuthorizationException;
 import com.course.services.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -49,6 +51,15 @@ public class ResourceExceptionHandler {
 	public ResponseEntity<StandardError> jwtAuthentication(JWTAuthenticationException e, HttpServletRequest request){
 		String error = "Authentication error";
 		HttpStatus status = HttpStatus.UNAUTHORIZED;
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(JWTAuthorizationException.class)
+	public ResponseEntity<StandardError> jwtAuthorization(JWTAuthorizationException e, HttpServletRequest request){
+		System.out.println("Linha 60");
+		String error = "Authorization error";
+		HttpStatus status = HttpStatus.FORBIDDEN;
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(status).body(err);
 	}
