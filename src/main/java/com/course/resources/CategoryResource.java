@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.course.dto.CategoryDTO;
-import com.course.entities.Category;
 import com.course.services.CategoryService;
 
 @RestController
