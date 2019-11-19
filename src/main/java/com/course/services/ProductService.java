@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.course.dto.CategoryDTO;
 import com.course.dto.ProductCategoriesDTO;
@@ -91,5 +91,14 @@ public class ProductService {
 			Category category = categoryRepository.getOne(cat.getId());
 			entity.getCategories().add(category);
 		}			
+	}
+
+	@Transactional(readOnly = true)
+	public Page<ProductDTO> findByCategoryPaged(Long categoryId, Pageable pageable) {
+		Category category = categoryRepository.getOne(categoryId);
+		
+		Page<Product> products = repository.findByCategory(category, pageable);
+		
+		return products.map(e -> new ProductDTO(e));
 	}
 }
