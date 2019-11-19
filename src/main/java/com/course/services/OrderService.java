@@ -2,15 +2,17 @@ package com.course.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.course.dto.OrderDTO;
+import com.course.dto.OrderItemDTO;
 import com.course.entities.Order;
+import com.course.entities.OrderItem;
 import com.course.entities.User;
 import com.course.repositories.OrderRepository;
 import com.course.services.exceptions.ResourceNotFoundException;
@@ -41,6 +43,15 @@ public class OrderService {
 		User client = authService.authenticated();
 		List<Order> list = repository.findByClient(client);
 		return list.stream().map(e -> new OrderDTO(e)).collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public List<OrderItemDTO> findItems(Long id) {		
+		Order order = repository.getOne(id);
+		authService.validadeOwnOrderOrAdmin(order);
+		Set<OrderItem> set = order.getItems();
+		
+		return set.stream().map(e -> new OrderItemDTO(e)).collect(Collectors.toList());
 	}
 	
 }

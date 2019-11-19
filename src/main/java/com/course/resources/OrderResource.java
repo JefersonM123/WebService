@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.course.dto.OrderDTO;
+import com.course.dto.OrderItemDTO;
 import com.course.services.OrderService;
 
 @RestController
@@ -39,4 +40,11 @@ public class OrderResource {
 		List<OrderDTO> list = service.findByClient();
 		return ResponseEntity.ok().body(list);
 	}
+	
+	@GetMapping(value="/{id}/items")
+	public ResponseEntity<List<OrderItemDTO>>findItems(@PathVariable Long id){
+		List<OrderItemDTO> list = service.findItems(id);
+		return ResponseEntity.ok().body(list);
+	}
+	
 }
