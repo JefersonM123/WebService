@@ -47,19 +47,19 @@ public class CategoryResource {
 	}
 	
 	@PreAuthorize("hasAnyRole('ADMIN')")
-	@DeleteMapping(value="/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id){
-		service.delete(id);		
-		return ResponseEntity.noContent().build();
-	}
-	
-	@PreAuthorize("hasAnyRole('ADMIN')")
 	@PutMapping(value="/{id}")
 	public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @RequestBody CategoryDTO dto){
 		dto = service.update(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
 	
+	
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	@DeleteMapping(value="/{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id){
+		service.delete(id);		
+		return ResponseEntity.noContent().build();
+	}	
 	
 	@GetMapping(value="/product/{productId}")
 	public ResponseEntity<List<CategoryDTO>> findByProduct(@PathVariable Long productId) {
