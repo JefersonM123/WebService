@@ -1,5 +1,6 @@
 package com.course.services;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,8 +14,12 @@ import com.course.dto.OrderDTO;
 import com.course.dto.OrderItemDTO;
 import com.course.entities.Order;
 import com.course.entities.OrderItem;
+import com.course.entities.Product;
 import com.course.entities.User;
+import com.course.entities.enums.OrderStatus;
+import com.course.repositories.OrderItemRepository;
 import com.course.repositories.OrderRepository;
+import com.course.repositories.ProductRepository;
 import com.course.repositories.UserRepository;
 import com.course.services.exceptions.ResourceNotFoundException;
 
@@ -23,6 +28,12 @@ public class OrderService {
 	
 	@Autowired
 	private OrderRepository repository;
+
+	@Autowired
+	private ProductRepository productRepository;
+	
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 	
 	@Autowired
 	private AuthService authService;
@@ -63,6 +74,23 @@ public class OrderService {
 		User client = userRepository.getOne(clientId);
 		List<Order> list = repository.findByClient(client);
 		return list.stream().map(e -> new OrderDTO(e)).collect(Collectors.toList());
+	}
+
+	@Transactional
+	public OrderDTO placeOrder(List<OrderItemDTO> dto) {
+		User client = authService.authenticated();
+		Order order = new Order(null, Instant.now(), OrderStatus.WAITING_PAYMENT, client);
+		
+		for(OrderItemDTO itemDTO:dto) {
+			Product product = productRepository.getOne(itemDTO.getProductId());
+			OrderItem item = new OrderItem(order, product, itemDTO.getQuantity(), itemDTO.getPrice());
+			order.getItems().add(item);
+		}
+		
+		repository.save(order);
+		orderItemRepository.saveAll(order.getItems());
+		
+		return new OrderDTO(order);		
 	}
 	
 }
