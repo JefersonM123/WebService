@@ -59,6 +59,10 @@ public class CategoryService {
 		}
 	}
 	
+	private void updateData(Category entity, CategoryDTO dto) {
+		entity.setName(dto.getName());
+	}
+	
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
@@ -67,11 +71,7 @@ public class CategoryService {
 		} catch (DataIntegrityViolationException e) {
 			throw new DataBaseException(e.getMessage());
 		}
-	}
-	
-	private void updateData(Category entity, CategoryDTO dto) {
-		entity.setName(dto.getName());
-	}
+	}	
 
 	@Transactional(readOnly = true)
 	public List<CategoryDTO> findByProduct(Long productId) {
