@@ -1,7 +1,9 @@
 package com.course.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -21,30 +23,53 @@ import com.course.entities.Product;
 import com.course.repositories.CategoryRepository;
 import com.course.repositories.ProductRepository;
 import com.course.services.exceptions.DataBaseException;
+import com.course.services.exceptions.ParamFormatException;
 import com.course.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class ProductService {
-	
+
 	@Autowired
 	private ProductRepository repository;
-	
+
 	@Autowired
 	private CategoryRepository categoryRepository;
-	
-	public Page<ProductDTO> findAllPaged(Pageable pageable){
-		Page<Product> list = repository.findAll(pageable);		
+
+	public Page<ProductDTO> findByNameCategoryPaged(String name, String categoriesStr, Pageable pageable) {
+		Page<Product> list;
+
+		if (categoriesStr.equals("")) {
+			list = repository.findByNameContainingIgnoreCase(name, pageable);
+		} else {
+			List<Long> ids = parseIds(categoriesStr);
+			List<Category> categories = ids.stream().map(id -> categoryRepository.getOne(id)).collect(Collectors.toList());
+			list = repository.findByNameContainingIgnoreCaseAndCategoriesIn(name, categories, pageable);
+		}
 		return list.map(e -> new ProductDTO(e));
 	}
-	
+
+	private List<Long> parseIds(String categoriesStr) {
+		String[] idsArray = categoriesStr.split(",");
+		List<Long> list = new ArrayList<>();
+		for (String idStr : idsArray) {
+			try {
+				list.add(Long.parseLong(idStr));
+			} catch (Exception e) {
+				throw new ParamFormatException("Invalid categories format");
+			}
+		}
+
+		return list;
+	}
+
 	public ProductDTO findById(Long id) {
-		Optional<Product> obj = repository.findById(id);		
+		Optional<Product> obj = repository.findById(id);
 		Product entity = obj.orElseThrow(() -> new ResourceNotFoundException(id));
 		return new ProductDTO(entity);
 	}
-	
+
 	@Transactional
-	public ProductDTO insert(ProductCategoriesDTO dto) {		
+	public ProductDTO insert(ProductCategoriesDTO dto) {
 		Product entity = dto.toEntity();
 		setProductCategories(entity, dto.getCategories());
 		entity = repository.save(entity);
@@ -60,48 +85,48 @@ public class ProductService {
 			return new ProductDTO(entity);
 		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException(id);
-		}		
+		}
 	}
-	
+
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException(id);
-		} catch(DataIntegrityViolationException e ) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DataBaseException(e.getMessage());
 		}
 	}
-	
+
 	private void updateData(Product entity, ProductCategoriesDTO dto) {
 		entity.setName(dto.getName());
 		entity.setDescription(dto.getDescription());
 		entity.setPrice(dto.getPrice());
 		entity.setImgUrl(dto.getImgUrl());
-		
-		if(dto.getCategories() != null && dto.getCategories().size() > 0) {
+
+		if (dto.getCategories() != null && dto.getCategories().size() > 0) {
 			setProductCategories(entity, dto.getCategories());
 		}
 	}
-	
+
 	private void setProductCategories(Product entity, List<CategoryDTO> categories) {
 		entity.getCategories().clear();
-		
-		for(CategoryDTO cat : categories) {
+
+		for (CategoryDTO cat : categories) {
 			Category category = categoryRepository.getOne(cat.getId());
 			entity.getCategories().add(category);
-		}			
+		}
 	}
 
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findByCategoryPaged(Long categoryId, Pageable pageable) {
 		Category category = categoryRepository.getOne(categoryId);
-		
+
 		Page<Product> products = repository.findByCategory(category, pageable);
-		
+
 		return products.map(e -> new ProductDTO(e));
 	}
-	
+
 	@Transactional
 	public void addCategory(Long id, CategoryDTO dto) {
 		Product product = repository.getOne(id);
@@ -109,7 +134,7 @@ public class ProductService {
 		product.getCategories().add(category);
 		repository.save(product);
 	}
-	
+
 	@Transactional
 	public void removeCategory(Long id, CategoryDTO dto) {
 		Product product = repository.getOne(id);
@@ -117,13 +142,12 @@ public class ProductService {
 		product.getCategories().remove(category);
 		repository.save(product);
 	}
-	
+
 	@Transactional
 	public void setCategories(Long id, List<CategoryDTO> dto) {
 		Product product = repository.getOne(id);
 		setProductCategories(product, dto);
 		repository.save(product);
 	}
-	
-	
+
 }
